@@ -18,3 +18,4 @@ res.json({
 module.exports = {
     courseRouter: courseRouter
 }
+
