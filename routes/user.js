@@ -2,7 +2,7 @@
 // const Router = express.Router;
 //---------OR----------------
 const {Router} = require("express");
-const {userModel, purchaseModel} = require("../db");
+const {userModel, purchaseModel, courseModel} = require("../db");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const {z} = require("zod");
@@ -76,12 +76,17 @@ if(passwordMatch){
 userRouter.get("/purchases",userMiddleware, async function (req, res){
 const userId = req.userId
 
-const purchase = await purchaseModel.find({
-    userId
-})
+const purchases = await purchaseModel.find({
+    userId,
+});
+
+ const coursesData = await courseModel.find({
+        _id: { $in: purchases.map(x => x.courseId) }
+    })
 
 res.json({
-    purchase
+    purchases,
+    coursesData
 })
 });
 
