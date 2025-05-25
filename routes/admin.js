@@ -6,8 +6,8 @@ const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken");
 const { email, json } = require("zod/v4");
 const { parse } = require("zod/v4-mini");
-const  JWT_ADMIN_SECRET = "123321secret"
-
+const  {JWT_ADMIN_SECRET} = require("../config");
+const {adminMiddleware} = require("../middleware/admin")
 
 adminRouter.post("/signup",async function (req, res){
     const reqBody = z.object({
@@ -68,9 +68,22 @@ adminRouter.post("/signin",async function (req, res){
 
 
 //create a course
-adminRouter.post("/course",function(req, res){
+adminRouter.post("/course",adminMiddleware, async function(req, res){
+const adminId = req.userId;
+
+const {title, description, imageUrl, price}  = req.body;
+const course = await adminModel.create({
+    title: title,
+    description: description,
+    imageUrl: imageUrl,
+    price: price,
+    creatorId: adminId
+})
+
+
     res.json({
-    message: "courseCreated endPoint"
+    message: "courseCreated ",
+    courseId : course._id
 })
 })
 
