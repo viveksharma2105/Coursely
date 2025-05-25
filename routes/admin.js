@@ -1,6 +1,6 @@
 const {Router} = require("express");
 const adminRouter = Router();
-const {adminModel} =  require("../db")
+const {adminModel, courseModel} =  require("../db")
 const  {z} = require("zod")
 const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken");
@@ -87,20 +87,46 @@ const course = await adminModel.create({
 })
 })
 
-adminRouter.put("/course", function (req, res){
-res.json({
-    message: "updateCourse endPoint"
-})
+adminRouter.put("/course",adminMiddleware, async function (req, res){
+const adminId = req.userId;
+
+const {title, description, imageUrl, price, courseId}  = req.body;
+
+const course = await courseModel.updateOne({
+    //if these feilds are saatisfied then the it'll be updateable
+    _id: courseId,
+    create: courseId
+},{
+    title: title,
+    description: description,
+    imageUrl: imageUrl,
+    price: price,
+    
 })
 
 
-adminRouter.get("/course/bulk", function (req, res){
-res.json({
-    message: "updateCourse endPoint"
+    res.json({
+    message: "Course Updated ",
+    courseId : course._id
 })
 })
 
+adminRouter.get("/course/bulk",adminMiddleware, async function (req, res){
+const adminId = req.userId;
 
+const {title, description, imageUrl, price, courseId}  = req.body;
+
+const courses = await courseModel.find({
+    courseId: adminId
+
+});
+
+
+    res.json({
+    message: "Course Updated ",
+    courses
+})
+})
 
 module.exports = {
     adminRouter: adminRouter
