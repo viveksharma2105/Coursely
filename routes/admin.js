@@ -28,6 +28,7 @@ adminRouter.post("/signup",async function (req, res){
             firstName: parsedBody.firstName,
             lastName: parsedBody.lastName
         })
+console.error(err);
 
 res.status(201).json({message: "Admin create successfully"});
 
@@ -72,7 +73,7 @@ adminRouter.post("/course",adminMiddleware, async function(req, res){
 const adminId = req.userId;
 
 const {title, description, imageUrl, price}  = req.body;
-const course = await adminModel.create({
+const course = await courseModel.create({
     title: title,
     description: description,
     imageUrl: imageUrl,
@@ -95,7 +96,7 @@ const {title, description, imageUrl, price, courseId}  = req.body;
 const course = await courseModel.updateOne({
     //if these feilds are saatisfied then the it'll be updateable
     _id: courseId,
-    create: courseId
+    creatorId: adminId
 },{
     title: title,
     description: description,
@@ -117,7 +118,7 @@ const adminId = req.userId;
 const {title, description, imageUrl, price, courseId}  = req.body;
 
 const courses = await courseModel.find({
-    courseId: adminId
+    creatorId: adminId
 
 });
 
