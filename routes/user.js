@@ -2,12 +2,12 @@
 // const Router = express.Router;
 //---------OR----------------
 const {Router} = require("express");
-const {userModel} = require("../db");
+const {userModel, purchaseModel} = require("../db");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const {z} = require("zod");
 const {JWT_USER_PWD}  = require("../config")
-
+const {userMiddleware} =  require("../middleware/user")
 const userRouter = Router();
 
 userRouter.post("/signup", async function (req, res) {
@@ -42,7 +42,7 @@ userRouter.post("/signup", async function (req, res) {
 
 
 
-userRouter.post("/signin", async function (req, res){
+userRouter.post("/signin",   async function (req, res){
     const {email, password} = req.body;
     const user = await userModel.findOne({
         email: email 
@@ -70,13 +70,20 @@ if(passwordMatch){
     }
 }
 
-)
+);
 
-userRouter.get("/purchases", function (req, res){
+
+userRouter.get("/purchases",userMiddleware, async function (req, res){
+const userId = req.userId
+
+const purchase = await purchaseModel.find({
+    userId
+})
+
 res.json({
-    message: "UserPurchase endPoint"
+    purchase
 })
-})
+});
 
 module.exports = {
     userRouter: userRouter
